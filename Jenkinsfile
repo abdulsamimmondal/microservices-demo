@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_HUB_USER = 'samimmondal'
     }
 
@@ -40,7 +39,7 @@ pipeline {
                         def imageName = "${DOCKER_HUB_USER}/${svc}:1.0"
                         dir(svc) {
                             sh "docker build -t ${imageName} ."
-                            withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                            withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                                 sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
                                 sh "docker push ${imageName}"
                             }
