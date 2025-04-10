@@ -56,10 +56,13 @@ pipeline {
             steps {
                 script {
                     def services = ['order-service', 'product-service', 'user-service']
-                    services.each { svc ->
-                        dir("${svc}/k8s") {
-                            sh "kubectl --insecure-skip-tls-verify apply -f deployment.yaml"
-                            sh "kubectl --insecure-skip-tls-verify apply -f service.yaml"
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+                        env.KUBECONFIG = KUBECONFIG_FILE
+                        services.each { svc ->
+                            dir("${svc}/k8s") {
+                                sh "kubectl apply -f deployment.yaml"
+                                sh "kubectl apply -f service.yaml"
+                            }
                         }
                     }
                 }
